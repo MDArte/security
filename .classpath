@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="core/target/src"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="var" path="MAVEN_REPO/jboss/jars/jbosssx-4.0.2.jar"/>
-	<classpathentry exported="true" kind="var" path="MAVEN_REPO/jboss/jars/jboss-j2ee-4.0.2.jar"/>
-	<classpathentry exported="true" kind="var" path="MAVEN_REPO/jboss/jars/jbossall-client-4.0.2.jar"/>
-	<classpathentry exported="true" kind="var" path="MAVEN_REPO/jboss/jars/jboss-ejb3x-4.2.3.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="MAVEN_REPO/jboss/jars/jbosssx-4.0.2.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/jboss/jars/jboss-j2ee-4.0.2.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/jboss/jars/jbossall-client-4.0.2.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/jboss/jars/jboss-ejb3x-4.2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

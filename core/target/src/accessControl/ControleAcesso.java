@@ -236,6 +236,4 @@ public abstract class ControleAcesso {
 		javax.security.auth.Subject subject = SecurityHolder.getSubject();
 		return getCallerPrincipal(subject);
 	}
-	
-	public abstract void posLogin(Operador operador, Object request, Object response) throws ControleAcessoException;
 }
