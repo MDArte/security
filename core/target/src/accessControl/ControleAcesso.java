@@ -22,217 +22,227 @@ import accessControl.exception.ImpossivelVerificarPermissaoException;
 import accessControl.exception.NomeProjetoNaoEncontradoException;
 import accessControl.exception.SubjectNaoIdentificadoException;
 
+public abstract class ControleAcesso
+{
 
-public abstract class ControleAcesso {
-	
-	public abstract  Collection<accessControl.Perfil> buscaPerfisServico(accessControl.Servico servico) 
-		throws ControleAcessoException;      	
-    
-	public abstract boolean precisaTrocarSenha(Operador operador)
-        throws ControleAcessoException;
+	public abstract Collection<accessControl.Perfil> buscaPerfisServico(accessControl.Servico servico) throws ControleAcessoException;
 
-    public abstract accessControl.Operador getOperador(java.lang.String usuario)
-        throws ControleAcessoException;
+	public abstract boolean precisaTrocarSenha(Operador operador) throws ControleAcessoException;
 
-    public abstract HashMap<String, java.util.Collection<Perfil>> listaServicos()
-        throws ControleAcessoException;
+	public abstract accessControl.Operador getOperador(java.lang.String usuario) throws ControleAcessoException;
 
-    public abstract boolean trocaSenha(Operador operador, String senhaAtual,
-        String novaSenha) throws ControleAcessoException;
+	public abstract HashMap<String, java.util.Collection<Perfil>> listaServicos() throws ControleAcessoException;
 
-    public abstract boolean senhaFraca(String senha);
+	public abstract boolean trocaSenha(Operador operador, String senhaAtual, String novaSenha) throws ControleAcessoException;
 
-    public abstract void bloqueiaUsuario(String usuario);
+	public abstract boolean senhaFraca(String senha);
 
-    public abstract boolean usuarioBloqueado(String usuario);
+	public abstract void bloqueiaUsuario(String usuario);
 
-    public abstract HashMap<String, Collection<Restricao>> getRestricoes(
-        Operador operador, Servico servico) throws ControleAcessoException;
+	public abstract boolean usuarioBloqueado(String usuario);
 
-    public static PrincipalImpl getCallerPrincipal(Subject subject) {
-        PrincipalImpl principalImpl = null;
-        Set principals = subject.getPrincipals();
-        Iterator itPrincipals = principals.iterator();
+	public abstract HashMap<String, Collection<Restricao>> getRestricoes(Operador operador, Servico servico) throws ControleAcessoException;
 
-        while (itPrincipals.hasNext()) {
-            Principal principal = (Principal) itPrincipals.next();
+	public static PrincipalImpl getCallerPrincipal(Subject subject)
+	{
+		PrincipalImpl principalImpl = null;
+		Set principals = subject.getPrincipals();
+		Iterator itPrincipals = principals.iterator();
 
-            if (principal.getName().equals("CallerPrincipal")) {
-                SimpleGroup simpleGroup = (SimpleGroup) principal;
-                principalImpl = (PrincipalImpl) simpleGroup.members()
-                                                           .nextElement();
-            }
-        }
+		while (itPrincipals.hasNext())
+		{
+			Principal principal = (Principal) itPrincipals.next();
 
-        return principalImpl;
-    }
+			if (principal.getName().equals("CallerPrincipal"))
+			{
+				SimpleGroup simpleGroup = (SimpleGroup) principal;
+				principalImpl = (PrincipalImpl) simpleGroup.members().nextElement();
+			}
+		}
 
-    public static boolean possuiPermissao(Collection<Perfil> perfisServico,
-        Collection<Perfil> perfisUsuario) {
-        boolean possuiPermissao = false;
+		return principalImpl;
+	}
 
-        if ((perfisServico != null) && (perfisUsuario != null)) {
-            for (Iterator it = perfisServico.iterator(); it.hasNext();) {
-                Perfil perfilServico = (Perfil) it.next();
+	public static boolean possuiPermissao(Collection<Perfil> perfisServico, Collection<Perfil> perfisUsuario)
+	{
+		boolean possuiPermissao = false;
 
-                if (perfisUsuario.contains(perfilServico)) {
-                    possuiPermissao = true;
-                }
-            }
-        }
+		if ((perfisServico != null) && (perfisUsuario != null))
+		{
+			for (Iterator it = perfisServico.iterator(); it.hasNext();)
+			{
+				Perfil perfilServico = (Perfil) it.next();
 
-        return possuiPermissao;
-    }
+				if (perfisUsuario.contains(perfilServico))
+				{
+					possuiPermissao = true;
+				}
+			}
+		}
 
-    public Collection<Perfil> getPerfisServico(Servico servico) throws Exception {
-        Collection<Perfil> perfisServico = null;
-        try {
-        	Subject subject = SecurityHolder.getSubject();
-            if (subject == null) {
-                throw new SubjectNaoIdentificadoException("subject.null");
-            }        	
-        	PrincipalImpl principal = getCallerPrincipal(subject);
-        	String nomeProjeto = principal.getNomeProjeto();
-        	if(nomeProjeto == null){
-        		throw new NomeProjetoNaoEncontradoException("nome.projeto.null");
-        	}
-        	HashMap<String, HashMap<String, Collection<Perfil>>> servicos = ServicosSingleton.instance().getServicos();
-        	if(servicos == null){
-        		throw new ImpossivelObterPerfisDeServicoException("servicos.null");
-        	}
-        	HashMap<String, Collection<Perfil>> servicosProjeto = (HashMap<String, Collection<Perfil>>) servicos.get(nomeProjeto);
-        	
-        	if(servicosProjeto != null){
-        		perfisServico = servicosProjeto.get(servico.getNome());
-        	}
-            return perfisServico;
-        } catch (NullPointerException npe) {
-            return null;
-        } catch (ClassCastException cce) {
-            return null;
-        }
-    }
+		return possuiPermissao;
+	}
 
- /*   public static boolean verificaPermissao(Subject subject,
-        HashMap<String, java.util.Collection<Perfil>> mapServicos,
-        Servico servico, boolean vista)
-        throws ImpossivelVerificarPermissaoException {
-        boolean possuiPermissao = false;
+	public Collection<Perfil> getPerfisServico(Servico servico) throws Exception
+	{
+		Collection<Perfil> perfisServico = null;
+		try
+		{
+			Subject subject = SecurityHolder.getSubject();
+			if (subject == null)
+			{
+				throw new SubjectNaoIdentificadoException("subject.null");
+			}
+			PrincipalImpl principal = getCallerPrincipal(subject);
+			String nomeProjeto = principal.getNomeProjeto();
+			if (nomeProjeto == null)
+			{
+				throw new NomeProjetoNaoEncontradoException("nome.projeto.null");
+			}
+			HashMap<String, HashMap<String, Collection<Perfil>>> servicos = ServicosSingleton.instance().getServicos();
+			if (servicos == null)
+			{
+				throw new ImpossivelObterPerfisDeServicoException("servicos.null");
+			}
+			HashMap<String, Collection<Perfil>> servicosProjeto = (HashMap<String, Collection<Perfil>>) servicos.get(nomeProjeto);
 
-        if (subject == null) {
-            throw new ImpossivelVerificarPermissaoException("subject.null");
-        }
+			if (servicosProjeto != null)
+			{
+				perfisServico = servicosProjeto.get(servico.getNome());
+			}
+			return perfisServico;
+		}
+		catch (NullPointerException npe)
+		{
+			return null;
+		}
+		catch (ClassCastException cce)
+		{
+			return null;
+		}
+	}
 
-        PrincipalImpl principalImpl = getCallerPrincipal(subject);
+	/*
+	 * public static boolean verificaPermissao(Subject subject, HashMap<String,
+	 * java.util.Collection<Perfil>> mapServicos, Servico servico, boolean
+	 * vista) throws ImpossivelVerificarPermissaoException { boolean
+	 * possuiPermissao = false;
+	 * 
+	 * if (subject == null) { throw new
+	 * ImpossivelVerificarPermissaoException("subject.null"); }
+	 * 
+	 * PrincipalImpl principalImpl = getCallerPrincipal(subject);
+	 * 
+	 * if (principalImpl == null) { throw new
+	 * ImpossivelVerificarPermissaoException("principal.null"); }
+	 * 
+	 * if (mapServicos != null) { Collection<Perfil> perfisServico =
+	 * mapServicos.get(servico.getNome()); Collection<Perfil> perfisUsuario =
+	 * principalImpl.getPerfis();
+	 * 
+	 * if (((perfisServico == null) || perfisServico.isEmpty()) && vista) {
+	 * possuiPermissao = true; } else { possuiPermissao =
+	 * possuiPermissao(perfisServico, perfisUsuario); } } else { if (vista) {
+	 * possuiPermissao = true; } } return possuiPermissao;
+	 * 
+	 * }
+	 */
 
-        if (principalImpl == null) {
-            throw new ImpossivelVerificarPermissaoException("principal.null");
-        }
+	public static boolean verificaPermissao(Subject subject, HashMap<String, java.util.Collection<Perfil>> mapServicos, Servico servico, boolean vista) throws ImpossivelVerificarPermissaoException, AcessoNegadoException, ControleAcessoException
+	{
+		boolean possuiPermissao = false;
 
-        if (mapServicos != null) {
-            Collection<Perfil> perfisServico = mapServicos.get(servico.getNome());
-            Collection<Perfil> perfisUsuario = principalImpl.getPerfis();
+		if (subject == null)
+		{
+			throw new ImpossivelVerificarPermissaoException("subject.null");
+		}
 
-            if (((perfisServico == null) || perfisServico.isEmpty()) && vista) {
-                possuiPermissao = true;
-            } else {
-                possuiPermissao = possuiPermissao(perfisServico, perfisUsuario);
-            }
-        } else {
-            if (vista) {
-                possuiPermissao = true;
-            }
-        }
-        return possuiPermissao;
-        
-    }*/
+		PrincipalImpl principalImpl = getCallerPrincipal(subject);
 
+		if (principalImpl == null)
+		{
+			throw new ImpossivelVerificarPermissaoException("principal.null");
+		}
 
-    public static boolean verificaPermissao(Subject subject,
-            HashMap<String, java.util.Collection<Perfil>> mapServicos,
-            Servico servico, boolean vista)
-            throws ImpossivelVerificarPermissaoException, AcessoNegadoException, ControleAcessoException {
-            boolean possuiPermissao = false;
+		Collection<Perfil> perfisUsuario = principalImpl.getPerfis();
 
-            if (subject == null) {
-                throw new ImpossivelVerificarPermissaoException("subject.null");
-            }
+		HashMap<String, Boolean> demandaMap = ServicosSingleton.instance().getDemanda();
 
-            PrincipalImpl principalImpl = getCallerPrincipal(subject);
+		Boolean demanda = demandaMap.get(principalImpl.getNomeProjeto());
 
-            if (principalImpl == null) {
-                throw new ImpossivelVerificarPermissaoException("principal.null");
-            }
-            
-            
-            Collection<Perfil> perfisUsuario = principalImpl.getPerfis();
-            HashMap<String, Boolean> demandaMap = ServicosSingleton.instance().getDemanda();
-            Boolean demanda = demandaMap.get(principalImpl.getNomeProjeto());
+		if (mapServicos != null)
+		{
+			Collection<Perfil> perfisServico = mapServicos.get(servico.getNome());
+			if (mapServicos.containsKey(servico.getNome()))
+			{
+				if (((perfisServico == null) || perfisServico.isEmpty()) && vista)
+				{
+					possuiPermissao = true;
+				}
+				else
+				{
+					possuiPermissao = possuiPermissao(perfisServico, perfisUsuario);
+				}
+			}
+			else
+			{
+				// if (!demanda && vista)
+				possuiPermissao = true;
+			}
 
-            
-            if (mapServicos != null) {
-                Collection<Perfil> perfisServico = mapServicos.get(servico.getNome());
-                if(mapServicos.containsKey(servico.getNome())){
-                    if (((perfisServico == null) || perfisServico.isEmpty()) && vista ) {
-                        possuiPermissao = true;
-                    } else {               
-                    	possuiPermissao = possuiPermissao(perfisServico, perfisUsuario);
-                    }                   	
-                }else{
-                	if(!demanda && vista)
-                		possuiPermissao = true;
-                }
-              
-                
-            }
-            if(demanda && !possuiPermissao) {
-            	if(mapServicos == null){
-            		mapServicos = new HashMap<String, Collection<Perfil>>();
-            	}            	
-            	ControleAcesso controle = ServicosSingleton.instance().getControles().get(principalImpl.getNomeProjeto());            	
-            	Collection perfisServico = controle.buscaPerfisServico(servico);
-        		mapServicos.put(servico.getNome(), perfisServico);      
-        		HashMap<String, HashMap<String, Collection<Perfil>>> servicos = ServicosSingleton.instance().getServicos();
-    			if(servicos == null)
-        			servicos = new HashMap<String, HashMap<String, Collection<Perfil>>>();
-        		servicos.put(principalImpl.getNomeProjeto(), mapServicos);      
-        		ServicosSingleton.instance().setServicos(servicos);
-        		if(perfisServico != null && !perfisServico.isEmpty()){
-        			possuiPermissao = possuiPermissao(perfisServico, perfisUsuario); 
-        		}else{
-        			if(vista)
-        				possuiPermissao = true;
-        		}    	
-      
-        		
-            }   
-            return possuiPermissao;
-    }
-            
-           /* } else {
-                if (vista) {
-                    possuiPermissao = true;
-                }
-            }*/
-          /*  if (!possuiPermissao) {
-            	Collection perfisServico = controle.buscaPerfisServico(servico);
-        		if(perfisServico != null && !perfisServico.isEmpty()){
-                	if(mapServicos == null){
-                		mapServicos = new HashMap<String, Collection<Perfil>>();
-                	}        			
-        			mapServicos.put(servico.getNome(), perfisServico);
-        			//ServicosSingleton.instance().setServicos(mapServicos);
-        			ServicosSingleton.instance().getServicos().put(principal.getNomeProjeto(), mapServicos);
-        		}
-        		possuiPermissao = ControleAcesso.verificaPermissao(subject, mapServicos, servico, false);            	
-                if(!possuiPermissao)
-                		throw new AcessoNegadoException("acesso.negado  - " + servico.getNome());                	
-            }  */
-           /* return possuiPermissao;
-            
-        }*/
+		}
+		if (demanda && !possuiPermissao)
+		{
+			if (mapServicos == null)
+			{
+				mapServicos = new HashMap<String, Collection<Perfil>>();
+			}
+			ControleAcesso controle = ServicosSingleton.instance().getControles().get(principalImpl.getNomeProjeto());
+			Collection perfisServico = controle.buscaPerfisServico(servico);
+			mapServicos.put(servico.getNome(), perfisServico);
+			HashMap<String, HashMap<String, Collection<Perfil>>> servicos = ServicosSingleton.instance().getServicos();
+			if (servicos == null)
+				servicos = new HashMap<String, HashMap<String, Collection<Perfil>>>();
+			servicos.put(principalImpl.getNomeProjeto(), mapServicos);
+			ServicosSingleton.instance().setServicos(servicos);
+			if (perfisServico != null && !perfisServico.isEmpty())
+			{
+				possuiPermissao = possuiPermissao(perfisServico, perfisUsuario);
+			}
+			else
+			{
+				if (vista)
+					possuiPermissao = true;
+			}
 
-	public static PrincipalImpl getPrincipal() {
+		}
+		return possuiPermissao;
+	}
+
+	/*
+	 * } else { if (vista) { possuiPermissao = true; } }
+	 */
+	/*
+	 * if (!possuiPermissao) { Collection perfisServico =
+	 * controle.buscaPerfisServico(servico); if(perfisServico != null &&
+	 * !perfisServico.isEmpty()){ if(mapServicos == null){ mapServicos = new
+	 * HashMap<String, Collection<Perfil>>(); }
+	 * mapServicos.put(servico.getNome(), perfisServico);
+	 * //ServicosSingleton.instance().setServicos(mapServicos);
+	 * ServicosSingleton
+	 * .instance().getServicos().put(principal.getNomeProjeto(), mapServicos); }
+	 * possuiPermissao = ControleAcesso.verificaPermissao(subject, mapServicos,
+	 * servico, false); if(!possuiPermissao) throw new
+	 * AcessoNegadoException("acesso.negado  - " + servico.getNome()); }
+	 */
+	/*
+	 * return possuiPermissao;
+	 * 
+	 * }
+	 */
+
+	public static PrincipalImpl getPrincipal()
+	{
 		javax.security.auth.Subject subject = SecurityHolder.getSubject();
 		return getCallerPrincipal(subject);
 	}
